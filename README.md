@@ -1,5 +1,5 @@
 # ecom-databricks
-# Ecom Lakehouse — Production-Grade Data Pipeline on Databricks
+# Ecommerce Lakehouse — Production-Grade Data Pipeline on Databricks
 
 An end-to-end data lakehouse built on Databricks using the medallion 
 architecture, Delta Live Tables, SCD Type 1, and automated CI/CD 
