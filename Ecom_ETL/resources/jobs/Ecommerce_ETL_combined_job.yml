@@ -1,0 +1,34 @@
+resources:
+  jobs:
+    Ecommerce_ETL_combined_job:
+      name: Ecommerce ETL combined job
+      schedule:
+        quartz_cron_expression: 40 40 10 * * ?
+        timezone_id: Asia/Calcutta
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: Ingestion
+          notebook_task:
+            notebook_path: ../../src/notebooks/Ingestion.ipynb
+            source: WORKSPACE
+        - task_key: Silver_Layer
+          depends_on:
+            - task_key: Ingestion
+          notebook_task:
+            notebook_path: ../../src/notebooks/Silver_Layer.ipynb
+            source: WORKSPACE
+        - task_key: Gold_Layer
+          depends_on:
+            - task_key: Silver_Layer
+          notebook_task:
+            notebook_path: ../../src/notebooks/Gold_Layer.ipynb
+            source: WORKSPACE
+        - task_key: Ecom_DLT
+          depends_on:
+            - task_key: Ingestion
+          pipeline_task:
+            pipeline_id: 6514023a-c1df-43d3-a316-e804776af2f7
+            full_refresh: true
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
