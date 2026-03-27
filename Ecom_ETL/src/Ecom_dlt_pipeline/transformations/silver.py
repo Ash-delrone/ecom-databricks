@@ -12,7 +12,7 @@ from pyspark.sql.functions import *
 
 def v_silver_orders():
     return (
-        spark.readStream.table("bronze_orders")
+        spark.readStream.table("bronze_orders_kafka")
         .withColumn("order_purchase_timestamp",to_timestamp(col("order_purchase_timestamp")))
         .withColumn("order_approved_at",to_timestamp(col("order_approved_at")))
         .withColumn("order_delivered_customer_date",to_timestamp(col("order_delivered_customer_date")))

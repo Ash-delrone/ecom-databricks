@@ -1,9 +1,69 @@
 import dlt
 from pyspark.sql.functions import *
+from pyspark.sql.types import *
 
-@dlt.table(
+ORDER_SCHEMA = StructType([
+    StructField("order_id", StringType()),
+    StructField("customer_id", StringType()),
+    StructField("order_status", StringType()),
+    StructField("order_purchase_timestamp", StringType()),
+    StructField("order_approved_at", StringType()),
+    StructField("order_delivered_carrier_date", StringType()),
+    StructField("order_delivered_customer_date", StringType()),
+    StructField("order_estimated_delivery_date", StringType())
+])
+
+dlt.create_streaming_table(
+    name="bronze_orders_kafka",
+    comment="Raw orders from Confluent Kafka topic Ecom_orders and historical data",
+)
+
+@dlt.append_flow(
+    target = "bronze_orders_kafka",
+    name="bronze_orders_kafka_streaming",
+    comment="Real-time orders from Confluent Kafka topic Ecom_orders"
+)
+def bronze_orders_kafka_streaming():
+    return (
+        spark.readStream
+        .format("kafka")
+        .option("kafka.bootstrap.servers",dbutils.secrets.get("kafka-secrets", "kafka-bootstrap-server"))
+        .option("kafka.security.protocol", "SASL_SSL")
+        .option("kafka.sasl.mechanism", "PLAIN")
+        .option("kafka.sasl.jaas.config",
+            'kafkashaded.org.apache.kafka.common.security.plain.PlainLoginModule required '
+            'username="{}" password="{}";'.format(
+                dbutils.secrets.get("kafka-secrets", "kafka-api-key"),
+                dbutils.secrets.get("kafka-secrets", "kafka-api-secret")
+            ))
+        .option("subscribe", "Ecom_orders")
+        .option("kafka.ssl.endpoint.identification.algorithm", "https")
+        .option("startingOffsets", "earliest")
+        .option("failOnDataLoss", "false")
+        .load()
+        .withColumn("parsed",from_json(col("value").cast("string"), ORDER_SCHEMA))
+        .select(
+            "parsed.order_id",
+            "parsed.customer_id",
+            "parsed.order_status",
+            "parsed.order_purchase_timestamp",
+            "parsed.order_approved_at",
+            "parsed.order_delivered_carrier_date",
+            "parsed.order_delivered_customer_date",
+            "parsed.order_estimated_delivery_date",
+            col("timestamp").alias("_kafka_timestamp"),
+            col("offset").alias("_kafka_offset")
+        )
+        .withColumn("_ingestion_time", current_timestamp())
+    )
+
+
+
+@dlt.append_flow(
+    target = "bronze_orders_kafka",
     name="bronze_orders",
-    comment="Raw orders from Olist CSV via Volumes — append only"
+    comment="Raw orders from Olist CSV via Volumes — append only",
+    # once = True
 )
 def bronze_orders():
     return (
