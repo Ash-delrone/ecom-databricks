@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    pipeline_ecom_dlt_pipeline:
+      name: Ecom_dlt_pipeline
+      libraries:
+        - glob:
+            include: ../../src/Ecom_dlt_pipeline/transformations/**
+      schema: pipeline
+      continuous: false
+      development: false
+      photon: true
+      channel: CURRENT
+      catalog: workspace
+      serverless: true
+      root_path: ../../src/Ecom_dlt_pipeline
