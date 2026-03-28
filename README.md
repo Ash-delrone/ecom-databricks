@@ -1,3 +1,4 @@
+# ecom-databricks
 # Ecommerce Lakehouse — Production-Grade Data Pipeline on Databricks
 
 An end-to-end data lakehouse built on Databricks using dual ingestion 
@@ -253,8 +254,7 @@ databricks bundle run ecom_combined_pipeline --target dev
 ---
 
 ## Author
-
-**Ashwani Srivastava**                           
-Data Engineer | Databricks Certified | PwC India                                          
-[LinkedIn](https://linkedin.com/in/ashwani2023) |
+**Ashwani Srivastava**  
+Data Engineer | Databricks Certified | PwC India  
+[LinkedIn](https://linkedin.com/in/ashwani2023) | 
 [Email](mailto:srivastava.ashwani448@gmail.com)
