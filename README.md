@@ -235,7 +235,7 @@ only — production security standard.
 ```bash
 # Clone repo
 git clone https://github.com/Ash-delrone/ecom-databricks.git
-cd ecom-lakehouse
+cd ecom-databricks
 
 # Configure Databricks
 databricks configure
